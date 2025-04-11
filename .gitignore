@@ -1,0 +1,27 @@
+.env
+media/
+trained_model/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.pkl
+*.tmp
+*.bak
+
+# Base de datos antigua
+*.sqlite3
+
+# Entornos virtuales
+env/
+venv/
+sistemagc/
+
+# Configuración de editores
+.vscode/
+.idea/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
