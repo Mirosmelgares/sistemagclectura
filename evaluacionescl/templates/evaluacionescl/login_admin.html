@@ -27,12 +27,15 @@
         </div>
 
         {% if messages %}
-            <div class="mt-2">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        <div class="mt-2">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show auto-dismiss" role="alert">
+                    {{ message|linebreaksbr }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
 
         <form method="POST">
             {% csrf_token %}
@@ -53,6 +56,19 @@
         </div>
     </div>
 </div>
+
+<script>
+    setTimeout(function () {
+        const alerts = document.querySelectorAll('.auto-dismiss');
+        alerts.forEach(function (alert) {
+            alert.classList.remove('show');  // Activa la transición (fade-out)
+            alert.addEventListener('transitionend', function () {
+                alert.remove();  // Remueve del DOM cuando la animación termina
+            });
+        });
+    }, 4000);
+</script>
+
 </body>
 </html>
 

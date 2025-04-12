@@ -68,3 +68,12 @@ def logout_usuario(request):
     "¡Gracias por participar!\n"
     "Vuelve a iniciar sesión cuando lo desees.")
     return redirect('login_usuario')
+
+def logout_admin(request):
+    request.session.flush()
+    messages.success(request,
+        "Sesión cerrada correctamente.\n"
+        "¡Hasta luego, administrador!\n"
+        "Vuelve a iniciar sesión cuando lo desees."
+    )
+    return redirect('login_admin')

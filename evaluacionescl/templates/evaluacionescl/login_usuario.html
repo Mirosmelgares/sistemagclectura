@@ -19,13 +19,14 @@
             <h4 class="mb-4">Iniciar sesión</h4>
         </div>
 
-        {% if messages %}
-            <div class="mt-2">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">{{ message|linebreaksbr }}</div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% if messages %} 
+        <div class="mt-2">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} auto-dismiss">{{ message|linebreaksbr }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
 
         <form method="POST">
             {% csrf_token %}
@@ -46,6 +47,19 @@
         </div>
     </div>
 </div>
+
+<script>
+    setTimeout(function () {
+        const mensajes = document.querySelectorAll('.auto-dismiss');
+        mensajes.forEach(function (msg) {
+            msg.style.transition = "opacity 0.5s ease";
+            msg.style.opacity = "0";
+            setTimeout(() => msg.remove(), 500); // luego lo quita del DOM
+        });
+    }, 4000); // 4 segundos visibles
+</script>
+
+
 </body>
 </html>
 

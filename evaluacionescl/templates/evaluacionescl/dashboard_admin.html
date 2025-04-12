@@ -49,10 +49,19 @@
         <hr>
         <a href="{% url 'admin:index' %}">⚙️ Panel Django Admin</a>
         <a href="{% url 'dashboard_admin' %}">🏠 Inicio admin</a>
-        <a href="{% url 'logout_usuario' %}">🚪 Cerrar sesión</a>
+        <a href="{% url 'logout_admin' %}">🚪 Cerrar sesión</a>
     </div>
 
     <div class="main">
+        {% if messages %}
+        <div class="mt-2">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show auto-dismiss" role="alert">
+                    {{ message|linebreaksbr }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
         <h2>Bienvenido, administrador</h2>
         <p>Selecciona una acción:</p>
 
@@ -74,5 +83,18 @@
             </div>
         </div>
     </div>
+
+    <script>
+        setTimeout(function () {
+            const alerts = document.querySelectorAll('.auto-dismiss');
+            alerts.forEach(function (alert) {
+                alert.classList.remove('show');  // Activa la transición (fade-out)
+                alert.addEventListener('transitionend', function () {
+                    alert.remove();  // Remueve del DOM cuando la animación termina
+                });
+            });
+        }, 4000);
+    </script>
+
 </body>
 </html>

@@ -128,7 +128,22 @@ def admin_estadisticas(request):
         'resultados': resultados,
         'query': query
     })
+#--------------------------------------------------------------------------------------------
 
+from django.contrib import messages
+from django.shortcuts import redirect
+
+def eliminar_usuario(request, usuario_id):
+    if request.method == "POST":
+        try:
+            usuario = RegistroUsuarios.objects.get(id=usuario_id)
+            usuario.delete()
+            messages.success(request, "Usuario eliminado correctamente.")
+        except RegistroUsuarios.DoesNotExist:
+            messages.error(request, "El usuario no existe.")
+    return redirect("admin_estadisticas")
+
+#----------------------------------------------------------------------------------------------
 from django.shortcuts import get_object_or_404, render, redirect
 from ..models import RegistroUsuarios, EvaluacionLecturaIndividual
 from .evaluacion_views import calcular_porcentaje  # Asegúrate de importar si está separado
@@ -354,6 +369,7 @@ def exportar_admin_resultados_excel(request):
 from django.db import connection
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.messages import add_message
 from ..models import RegistroAdmin, RegistroUsuarios, EvaluacionLectura, EvaluacionLecturaIndividual, VistaAdmin
 
 def reset_auto_increment(tabla):
@@ -362,28 +378,13 @@ def reset_auto_increment(tabla):
 
 def resetear_datos(request):
     if 'admin_id' not in request.session:
-        return redirect('login_admin')  # validación personalizada
+        return redirect('login_admin')
 
     if request.method == "POST":
-        if "reset_usuarios" in request.POST:
+        if "reset_todo" in request.POST:
+            # Eliminar todo, incluyendo el admin actual
             RegistroUsuarios.objects.all().delete()
-            EvaluacionLectura.objects.all().delete()
-            EvaluacionLecturaIndividual.objects.all().delete()
-            VistaAdmin.objects.all().delete()
-
-            reset_auto_increment("evaluacionescl_registrousuarios")
-            reset_auto_increment("evaluacionescl_evaluacionlectura")
-            reset_auto_increment("evaluacionescl_evaluacionlecturaindividual")
-            reset_auto_increment("evaluacionescl_vistaadmin")
-
-            messages.success(request, "👥 Datos de usuarios reseteados correctamente.")
-            return redirect("dashboard_admin")
-
-        elif "reset_todo" in request.POST:
-            admin_id = request.session.get("admin_id")
-
-            RegistroUsuarios.objects.all().delete()
-            RegistroAdmin.objects.exclude(id=admin_id).delete()  # NO elimina al admin en sesión
+            RegistroAdmin.objects.all().delete()
             EvaluacionLectura.objects.all().delete()
             EvaluacionLecturaIndividual.objects.all().delete()
             VistaAdmin.objects.all().delete()
@@ -394,12 +395,15 @@ def resetear_datos(request):
             reset_auto_increment("evaluacionescl_evaluacionlecturaindividual")
             reset_auto_increment("evaluacionescl_vistaadmin")
 
-            messages.success(request, "⚠️ Se reseteó TODO excepto el admin en sesión.")
-            return redirect("dashboard_admin")
+            # Guardar mensaje antes de limpiar sesión
+            add_message(request, messages.SUCCESS, "⚠️ Se reseteó TODO, incluyendo el admin en sesión.")
+
+            # Limpiar la sesión y redirigir
+            request.session.flush()
+            return redirect("login_admin")
 
         elif "cancelar" in request.POST:
             messages.info(request, "🚫 Operación cancelada.")
             return redirect("dashboard_admin")
 
     return render(request, "evaluacionescl/resetear_datos_confirmacion.html")
-
